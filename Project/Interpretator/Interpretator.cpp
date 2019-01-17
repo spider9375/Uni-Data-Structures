@@ -14,6 +14,8 @@ std::string MINUS = "MINUS";
 std::string MUL = "MUL";
 std::string DIV = "DIV";
 std::string EoF = "EOF";
+std::string LPAREN = "(";
+std::string RPAREN = ")";
 char NULL_CHAR = '\0';
 std::string::size_type sz;
 
@@ -113,10 +115,22 @@ struct Lexer
 				return new Token(MUL, "*");
 			}
 
-			if (this->currentChar == '/');
+			if (this->currentChar == '/')
 			{
 				this->Advance();
 				return new Token(DIV, "/");
+			}
+
+			if (this->currentChar == '(')
+			{
+				this->Advance();
+				return new Token(LPAREN, "(");
+			}
+			
+			if (this->currentChar == ')')
+			{
+				this->Advance();
+				return new Token(RPAREN, ")");
 			}
 
 			this->Error();
@@ -157,8 +171,18 @@ struct Interpreter
 	unsigned long int Factor()
 	{
 		Token* token = this->currentToken;
-		this->Eat(INTEGER);
-		return std::stoi(token->value);
+		if (token->type == INTEGER)
+		{
+			this->Eat(INTEGER);
+			return std::stoi(token->value);
+		}
+		else if (token->type == LPAREN)
+		{
+			this->Eat(LPAREN);
+			unsigned long int result = this->Expression();
+			this->Eat(RPAREN);
+			return result;
+		}
 	}
 
 	unsigned long int Term()
@@ -185,8 +209,8 @@ struct Interpreter
 
 	unsigned long int Expression()
 	{
-
 		unsigned long int result = this->Term();
+
 		while (this->currentToken->type == PLUS || this->currentToken->type == MINUS)
 		{
 			Token* token = this->currentToken;
@@ -209,7 +233,6 @@ struct Interpreter
 int _tmain(int argc, _TCHAR* argv[])
 {
 	std::string input;
-
 	while (std::getline(std::cin, input))
 	{
 		if (input != "")

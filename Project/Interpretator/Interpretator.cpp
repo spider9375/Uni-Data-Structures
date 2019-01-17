@@ -11,8 +11,10 @@
 std::string INTEGER = "INTEGER";
 std::string PLUS = "PLUS";
 std::string MINUS = "MINUS";
-char NULL_CHAR = '\0';
+std::string MUL = "MUL";
+std::string DIV = "DIV";
 std::string EoF = "EOF";
+char NULL_CHAR = '\0';
 std::string::size_type sz;
 
 struct Token
@@ -27,36 +29,22 @@ struct Token
 	}
 };
 
-struct Variable
-{
-	std::string name;
-	unsigned long int value;
-
-	Variable(std::string _name, unsigned long int _value)
-	{
-		this->name = _name;
-		this->value = _value;
-	}
-};
-
-struct Interpreter
+struct Lexer
 {
 	std::string text;
-	int pos = 0;
-	Token* currentToken = nullptr;
+	int pos;
 	char currentChar;
 
-	Interpreter(std::string _text)
+	Lexer(std::string _text)
 	{
 		this->text = _text;
 		this->pos = 0;
-		this->currentToken = nullptr;
 		this->currentChar = this->text[this->pos];
 	}
 
 	void Error()
 	{
-		throw std::exception("Error");
+		throw std::exception("Invalid character");
 	}
 
 	void Advance()
@@ -80,7 +68,7 @@ struct Interpreter
 		}
 	}
 
-	int Integer()
+	unsigned long int Integer()
 	{
 		std::string result = "";
 		while (this->currentChar != NULL_CHAR && isdigit(this->currentChar))
@@ -101,7 +89,7 @@ struct Interpreter
 				this->skipWhitespace();
 				continue;
 			}
-			
+
 			if (isdigit(this->currentChar))
 			{
 				return new Token(INTEGER, std::to_string(this->Integer()));
@@ -119,17 +107,46 @@ struct Interpreter
 				return new Token(MINUS, "-");
 			}
 
+			if (this->currentChar == '*')
+			{
+				this->Advance();
+				return new Token(MUL, "*");
+			}
+
+			if (this->currentChar == '/');
+			{
+				this->Advance();
+				return new Token(DIV, "/");
+			}
+
 			this->Error();
 		}
 
 		return new Token(EoF, EoF);
+	}
+};
+
+struct Interpreter
+{
+	Lexer* lexer;
+	Token* currentToken = nullptr;
+
+	Interpreter(Lexer* _lexer)
+	{
+		this->lexer = _lexer;
+		this->currentToken = this->lexer->GetNextToken();
+	}
+
+	void Error()
+	{
+		throw std::exception("Invalid character");
 	}
 
 	void Eat(std::string tokenType)
 	{
 		if (this->currentToken->type == tokenType)
 		{
-			this->currentToken = this->GetNextToken();
+			this->currentToken = this->lexer->GetNextToken();
 		}
 		else
 		{
@@ -137,16 +154,37 @@ struct Interpreter
 		}
 	}
 
-	unsigned long int Term()
+	unsigned long int Factor()
 	{
 		Token* token = this->currentToken;
 		this->Eat(INTEGER);
 		return std::stoi(token->value);
 	}
 
+	unsigned long int Term()
+	{
+		unsigned int result = this->Factor();
+
+		while (this->currentToken->type == MUL || this->currentToken->type == DIV)
+		{
+			Token* token = this->currentToken;
+			if (token->type == MUL)
+			{
+				this->Eat(MUL);
+				result = result * this->Factor();
+			}
+			else if (token->type == DIV)
+			{
+				this->Eat(DIV);
+				result = result / this->Factor();
+			}
+		}
+
+		return result;
+	}
+
 	unsigned long int Expression()
 	{
-		this->currentToken = this->GetNextToken();
 
 		unsigned long int result = this->Term();
 		while (this->currentToken->type == PLUS || this->currentToken->type == MINUS)
@@ -176,7 +214,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		if (input != "")
 		{
-			Interpreter* interpreter = new Interpreter(input);
+			Lexer* lexer = new Lexer(input);
+			Interpreter* interpreter = new Interpreter(lexer);
 			unsigned long int result = interpreter->Expression();
 
 			std::cout << result << std::endl;

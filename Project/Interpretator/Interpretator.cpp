@@ -137,33 +137,31 @@ struct Interpreter
 		}
 	}
 
+	unsigned long int Term()
+	{
+		Token* token = this->currentToken;
+		this->Eat(INTEGER);
+		return std::stoi(token->value);
+	}
+
 	unsigned long int Expression()
 	{
 		this->currentToken = this->GetNextToken();
-		Token* left = this->currentToken;
-		this->Eat(INTEGER);
 
-		Token* op = this->currentToken;
-		if (op->type == PLUS)
+		unsigned long int result = this->Term();
+		while (this->currentToken->type == PLUS || this->currentToken->type == MINUS)
 		{
-			this->Eat(PLUS);
-		}
-		else
-		{
-			this->Eat(MINUS);
-		}
-
-		Token* right = this->currentToken;
-		this->Eat(INTEGER);
-		unsigned int result;
-
-		if (op->type == PLUS)
-		{
-			result = std::stoi(left->value) + std::stoi(right->value);
-		}
-		else
-		{
-			result = std::stoi(left->value) - std::stoi(right->value);
+			Token* token = this->currentToken;
+			if (token->type == PLUS)
+			{
+				this->Eat(PLUS);
+				result = result + this->Term();
+			}
+			else if (token->type == MINUS)
+			{
+				this->Eat(MINUS);
+				result = result - this->Term();
+			}
 		}
 
 		return result;

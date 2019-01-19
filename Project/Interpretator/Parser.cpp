@@ -56,7 +56,7 @@ AST* Parser::Term()
 {
 	AST* node = this->Factor();
 
-	while (this->currentToken->type == MUL || this->currentToken->type == DIV)
+	while (this->currentToken->type == MUL || this->currentToken->type == DIV || this->currentToken->type == MOD)
 	{
 		Token* token = this->currentToken;
 
@@ -67,6 +67,10 @@ AST* Parser::Term()
 		else if (token->type == DIV)
 		{
 			this->Eat(DIV);
+		}
+		else if (token->type == MOD)
+		{
+			this->Eat(MOD);
 		}
 
 		node = new BinaryOperation(node, token, this->Factor());
@@ -102,7 +106,22 @@ AST* Parser::AssignStatement()
 	Var* left = this->Variable();
 	Token* token = this->currentToken;
 	this->Eat(ASSIGN);
-	AST* right = this->Expression();
+	AST* right;
+	if (this->currentToken->type == ID)
+	{
+		if (std::find(OPERATORS.begin(), OPERATORS.end(), this->lexer->Peek()) != OPERATORS.end())
+		{
+			right = this->Expression();
+		}
+		else
+		{
+			right = this->Variable();
+		}
+	}
+	else {
+
+		right = this->Expression();
+	}
 
 	AST* node = new Assign(left, token, right);
 

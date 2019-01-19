@@ -14,6 +14,7 @@ public:
 	void Advance();
 	void skipWhitespace();
 	unsigned long int Integer();
+	char Peek();
 	Token* GetNextToken();
 
 };

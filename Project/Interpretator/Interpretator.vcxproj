@@ -85,7 +85,6 @@
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Interpreter.h" />
     <ClInclude Include="Lexer.h" />
-    <ClInclude Include="NodeVisitor.h" />
     <ClInclude Include="NoOp.h" />
     <ClInclude Include="Number.h" />
     <ClInclude Include="Parser.h" />

@@ -21,7 +21,7 @@ unsigned long int Interpreter::visit(AST* node)
 {
 	Number* number = dynamic_cast<Number*>(node);
 	BinaryOperation* binOp = dynamic_cast<BinaryOperation*>(node);
-	
+	Assign* assign = dynamic_cast<Assign*>(node);
 	if (number)
 	{
 		return this->VisitNumber((Number*)node);
@@ -30,11 +30,24 @@ unsigned long int Interpreter::visit(AST* node)
 	{
 		return this->VisitBinOp((BinaryOperation*)node);
 	}
-	else
+	else if (assign)
 	{
 		 this->visitAssign((Assign*)node);
 	}
+	else
+	{
+		return this->visitVar((Var*)node);
+	}
+}
 
+unsigned long int Interpreter::visitVar(Var* node)
+{
+	if (VAR_TABLE.count(node->name) < 0)
+	{
+		throw std::exception("No variable exists");
+	}
+		
+	return VAR_TABLE[node->name];
 }
 
 unsigned long int Interpreter::VisitBinOp(BinaryOperation* node)
@@ -54,35 +67,42 @@ unsigned long int Interpreter::VisitBinOp(BinaryOperation* node)
 		return this->visit(node->left) * this->visit(node->right);
 	}
 
-	else //(node->op->type == DIV)
+	else if(node->op->type == DIV)
 	{
 		return this->visit(node->left) / this->visit(node->right);
+	}
+
+	else
+	{
+		return this->visit(node->left) % this->visit(node->right);
 	}
 }
 
 void Interpreter::visitAssign(Assign* node)
 {
 	std::string varName = node->left->name;
-	VAR_TABLE[varName] = this->visit(node->right);
+	Var* variable = dynamic_cast<Var*>(node->right);
+	if (variable)
+	{
+		VAR_TABLE[varName] = VAR_TABLE[variable->name];
+	}
+	else
+	{
+		VAR_TABLE[varName] = this->visit(node->right);
+	}
 }
 
 void Interpreter::visitPrint(Print* node)
 {
 	unsigned long int result = VAR_TABLE[node->variable->name];
 
-	if (result)
+	if (result >= 0)
 	{
 		std::cout << result << std::endl;
 	}
 }
 
-unsigned long int Interpreter::Interpret()
-{
-	AST* tree = this->parser->Parse();
-	return this->visit(tree);
-}
-
-void Interpreter::Test()
+void Interpreter::Interpret()
 {
 	AST* node = this->parser->Parse();
 	Assign* assign = dynamic_cast<Assign*>(node);

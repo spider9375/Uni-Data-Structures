@@ -22,10 +22,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			Lexer a = Lexer(input);
 			Parser b = Parser(&a);
 			Interpreter c = Interpreter(&b);
-			c.Test();
-			/*unsigned long int result = c.Interpret();
-
-			std::cout << result << std::endl;*/
+			c.Interpret();
 		}
 
 	}

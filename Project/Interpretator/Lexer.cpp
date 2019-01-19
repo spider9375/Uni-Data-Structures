@@ -19,6 +19,17 @@ void Lexer::Error()
 	throw std::exception("Invalid character");
 }
 
+char Lexer::Peek()
+{
+	int peekPos = this->pos + 1;
+	if (peekPos > this->text.size() - 1)
+	{
+		return NULL_CHAR;
+	}
+	
+	return this->text[peekPos];
+}
+
 Token* Lexer::Id()
 {
 	std::string result = "";
@@ -30,7 +41,7 @@ Token* Lexer::Id()
 
 	if (KEYWORDS.count(result) > 0)
 	{
-		return KEYWORDS[result];
+		return new Token(KEYWORDS[result]);
 	}
 
 	return new Token(ID, result);
@@ -84,51 +95,17 @@ Token* Lexer::GetNextToken()
 			return this->Id();
 		}
 
-		if (this->currentChar == '=')
-		{
-			this->Advance();
-			return new Token(ASSIGN, "=");
-		}
-
 		if (isdigit(this->currentChar))
 		{
 			return new Token(INTEGER, std::to_string(this->Integer()));
 		}
 
-		if (this->currentChar == '+')
+		if (KEYWORDS.count(std::string(1,this->currentChar)) > 0)
 		{
+			char currentChar = this->currentChar;
 			this->Advance();
-			return new Token(PLUS, "+");
-		}
-
-		if (this->currentChar == '-')
-		{
-			this->Advance();
-			return new Token(MINUS, "-");
-		}
-
-		if (this->currentChar == '*')
-		{
-			this->Advance();
-			return new Token(MUL, "*");
-		}
-
-		if (this->currentChar == '/')
-		{
-			this->Advance();
-			return new Token(DIV, "/");
-		}
-
-		if (this->currentChar == '(')
-		{
-			this->Advance();
-			return new Token(LPAREN, "(");
-		}
-
-		if (this->currentChar == ')')
-		{
-			this->Advance();
-			return new Token(RPAREN, ")");
+			Token* token = new Token(KEYWORDS[std::string(1, currentChar)]);
+			return token;
 		}
 
 		this->Error();

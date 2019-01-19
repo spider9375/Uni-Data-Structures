@@ -6,6 +6,8 @@
 #include "Assign.h"
 #include "NoOp.h"
 #include "Print.h"
+#include <cstring>
+#include <algorithm>
 
 class Parser
 {

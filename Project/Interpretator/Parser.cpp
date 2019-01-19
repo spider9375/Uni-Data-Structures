@@ -44,6 +44,11 @@ AST* Parser::Factor()
 		AST* node = this->Expression();
 		this->Eat(RPAREN);
 		return node;
+	} 
+	else
+	{
+		AST* node = this->Variable();
+		return node;
 	}
 }
 
@@ -92,7 +97,60 @@ AST* Parser::Expression()
 	return node;
 }
 
+AST* Parser::AssignStatement()
+{
+	Var* left = this->Variable();
+	Token* token = this->currentToken;
+	this->Eat(ASSIGN);
+	AST* right = this->Expression();
+
+	AST* node = new Assign(left, token, right);
+
+	return node;
+}
+
+Var* Parser::Variable()
+{
+	Var* node = new Var(this->currentToken);
+	this->Eat(ID);
+	return node;
+}
+
 AST* Parser::Parse()
 {
-	return this->Expression();
+	AST* node = this->Statement();
+
+	return node;
+}
+
+AST* Parser::PrintStatement()
+{
+	this->Eat(PRINT);
+	Var* variable = this->Variable();
+
+	return new Print(variable);
+}
+
+AST* Parser::Statement()
+{
+	AST* node;
+	if (this->currentToken->type == ID)
+	{
+		node = this->AssignStatement();
+	}
+	else if (this->currentToken->type == PRINT)
+	{
+		node = this->PrintStatement();
+	}
+	else 
+	{
+		node = this->Empty();
+	}
+
+	return node;
+}
+
+AST* Parser::Empty()
+{
+	return new NoOp();
 }

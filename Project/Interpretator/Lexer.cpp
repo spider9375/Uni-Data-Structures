@@ -19,6 +19,23 @@ void Lexer::Error()
 	throw std::exception("Invalid character");
 }
 
+Token* Lexer::Id()
+{
+	std::string result = "";
+	while (this->currentChar != NULL_CHAR && isalnum(this->currentChar))
+	{
+		result += this->currentChar;
+		this->Advance();
+	}
+
+	if (KEYWORDS.count(result) > 0)
+	{
+		return KEYWORDS[result];
+	}
+
+	return new Token(ID, result);
+}
+
 void Lexer::Advance()
 {
 	this->pos++;
@@ -49,7 +66,7 @@ unsigned long int Lexer::Integer()
 		this->Advance();
 	}
 
-	return std::stoi(result);
+	return std::stoul(result);
 }
 
 Token* Lexer::GetNextToken()
@@ -60,6 +77,17 @@ Token* Lexer::GetNextToken()
 		{
 			this->skipWhitespace();
 			continue;
+		}
+
+		if (isalpha(this->currentChar))
+		{
+			return this->Id();
+		}
+
+		if (this->currentChar == '=')
+		{
+			this->Advance();
+			return new Token(ASSIGN, "=");
 		}
 
 		if (isdigit(this->currentChar))

@@ -13,17 +13,19 @@
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	std::string input;
+	std::string input = "";
+	
 	while (std::getline(std::cin, input))
 	{
 		if (input != "")
 		{
-			Lexer* lexer = new Lexer(input);
-			Parser* parser = new Parser(lexer);
-			Interpreter* interpreter = new Interpreter(parser);
-			unsigned long int result = interpreter->Interpret();
+			Lexer a = Lexer(input);
+			Parser b = Parser(&a);
+			Interpreter c = Interpreter(&b);
+			c.Test();
+			/*unsigned long int result = c.Interpret();
 
-			std::cout << result << std::endl;
+			std::cout << result << std::endl;*/
 		}
 
 	}

@@ -26,8 +26,15 @@ unsigned long int Interpreter::visit(AST* node)
 	{
 		return this->VisitNumber((Number*)node);
 	}
+	else if (binOp)
+	{
+		return this->VisitBinOp((BinaryOperation*)node);
+	}
+	else
+	{
+		 this->visitAssign((Assign*)node);
+	}
 
-	return this->VisitBinOp((BinaryOperation*)node);
 }
 
 unsigned long int Interpreter::VisitBinOp(BinaryOperation* node)
@@ -53,8 +60,39 @@ unsigned long int Interpreter::VisitBinOp(BinaryOperation* node)
 	}
 }
 
+void Interpreter::visitAssign(Assign* node)
+{
+	std::string varName = node->left->name;
+	VAR_TABLE[varName] = this->visit(node->right);
+}
+
+void Interpreter::visitPrint(Print* node)
+{
+	unsigned long int result = VAR_TABLE[node->variable->name];
+
+	if (result)
+	{
+		std::cout << result << std::endl;
+	}
+}
+
 unsigned long int Interpreter::Interpret()
 {
 	AST* tree = this->parser->Parse();
 	return this->visit(tree);
+}
+
+void Interpreter::Test()
+{
+	AST* node = this->parser->Parse();
+	Assign* assign = dynamic_cast<Assign*>(node);
+	Print* print = dynamic_cast<Print*>(node);
+	if (assign)
+	{
+		this->visitAssign((Assign*)node);
+	}
+	else if (print)
+	{
+		this->visitPrint((Print*)node);
+	}
 }

@@ -1,15 +1,15 @@
 #pragma once
-#include "Token.h"
-
+#include "Globals.h"
 class Lexer
 {
-	std::string text;
 	int pos;
 	char currentChar;
 
 public:
+	std::string text;
 	Lexer(std::string _text);
 	~Lexer();
+	Token* Id();
 	void Error();
 	void Advance();
 	void skipWhitespace();

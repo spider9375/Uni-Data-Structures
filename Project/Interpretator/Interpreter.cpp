@@ -1,11 +1,10 @@
 #include "stdafx.h"
 #include "Interpreter.h"
+#include <typeinfo>
 
-
-Interpreter::Interpreter(Lexer* _lexer)
+Interpreter::Interpreter(Parser* _parser)
 {
-	this->lexer = _lexer;
-	this->currentToken = this->lexer->GetNextToken();
+	this->parser = _parser;
 }
 
 
@@ -13,77 +12,49 @@ Interpreter::~Interpreter()
 {
 }
 
-void Interpreter::Error()
+unsigned long int Interpreter::VisitNumber(Number* node)
 {
-	this->lexer->Error();
-}
-void Interpreter::Eat(std::string tokenType)
-{
-	if (this->currentToken->type == tokenType)
-	{
-		this->currentToken = this->lexer->GetNextToken();
-	}
-	else
-	{
-		this->Error();
-	}
-}
-unsigned long int Interpreter::Factor()
-{
-	Token* token = this->currentToken;
-	if (token->type == INTEGER)
-	{
-		this->Eat(INTEGER);
-		return std::stoi(token->value);
-	}
-	else if (token->type == LPAREN)
-	{
-		this->Eat(LPAREN);
-		unsigned long int result = this->Expression();
-		this->Eat(RPAREN);
-		return result;
-	}
-}
-unsigned long int Interpreter::Term()
-{
-	unsigned int result = this->Factor();
-
-	while (this->currentToken->type == MUL || this->currentToken->type == DIV)
-	{
-		Token* token = this->currentToken;
-		if (token->type == MUL)
-		{
-			this->Eat(MUL);
-			result = result * this->Factor();
-		}
-		else if (token->type == DIV)
-		{
-			this->Eat(DIV);
-			result = result / this->Factor();
-		}
-	}
-
-	return result;
+	return node->value;
 }
 
-unsigned long int Interpreter::Expression()
+unsigned long int Interpreter::visit(AST* node)
 {
-	unsigned long int result = this->Term();
-
-	while (this->currentToken->type == PLUS || this->currentToken->type == MINUS)
+	Number* number = dynamic_cast<Number*>(node);
+	BinaryOperation* binOp = dynamic_cast<BinaryOperation*>(node);
+	
+	if (number)
 	{
-		Token* token = this->currentToken;
-		if (token->type == PLUS)
-		{
-			this->Eat(PLUS);
-			result = result + this->Term();
-		}
-		else if (token->type == MINUS)
-		{
-			this->Eat(MINUS);
-			result = result - this->Term();
-		}
+		return this->VisitNumber((Number*)node);
 	}
 
-	return result;
+	return this->VisitBinOp((BinaryOperation*)node);
+}
+
+unsigned long int Interpreter::VisitBinOp(BinaryOperation* node)
+{
+	if (node->op->type == PLUS)
+	{
+		return this->visit(node->left) + this->visit(node->right);
+	}
+
+	else if (node->op->type == MINUS)
+	{
+		return this->visit(node->left) - this->visit(node->right);
+	}
+
+	else if (node->op->type == MUL)
+	{
+		return this->visit(node->left) * this->visit(node->right);
+	}
+
+	else //(node->op->type == DIV)
+	{
+		return this->visit(node->left) / this->visit(node->right);
+	}
+}
+
+unsigned long int Interpreter::Interpret()
+{
+	AST* tree = this->parser->Parse();
+	return this->visit(tree);
 }

@@ -1,19 +1,21 @@
 #pragma once
-#include "Lexer.h"
+#include "Parser.h"
+//#include "NodeVisitor.h"
 
 class Interpreter
 {
-	Lexer* lexer;
+	Parser* parser;
 	Token* currentToken = nullptr;
-
+	Number* returnNumber(AST* node);
+	BinaryOperation* returnBinOp(AST* node);
 public:
-	Interpreter(Lexer* _lexer);
+	Interpreter(Parser* _parser);
 	~Interpreter();
-	void Error();
-	void Eat(std::string tokenType);
-	unsigned long int Factor();
-	unsigned long int Term();
-	unsigned long int Expression();
-
+	unsigned long int visit(AST* node);
+	unsigned long int VisitNumber(Number* node);
+	unsigned long int VisitBinOp(BinaryOperation* node);
+	unsigned long int Interpret();
+	//unsigned long int visit(Number* node) override;
+	//unsigned long int visit(BinaryOperation* node) override;
 };
 

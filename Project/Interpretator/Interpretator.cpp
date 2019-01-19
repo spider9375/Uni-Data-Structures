@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <locale>
 #include "Interpreter.h"
+#include "Parser.h"
 
 
 int _tmain(int argc, _TCHAR* argv[])
@@ -18,8 +19,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		if (input != "")
 		{
 			Lexer* lexer = new Lexer(input);
-			Interpreter* interpreter = new Interpreter(lexer);
-			unsigned long int result = interpreter->Expression();
+			Parser* parser = new Parser(lexer);
+			Interpreter* interpreter = new Interpreter(parser);
+			unsigned long int result = interpreter->Interpret();
 
 			std::cout << result << std::endl;
 		}

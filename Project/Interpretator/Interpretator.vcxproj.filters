@@ -69,6 +69,12 @@
     <ClInclude Include="Print.h">
       <Filter>Header Files\Abstract Syntax Trees</Filter>
     </ClInclude>
+    <ClInclude Include="Read.h">
+      <Filter>Header Files\Abstract Syntax Trees</Filter>
+    </ClInclude>
+    <ClInclude Include="Function.h">
+      <Filter>Header Files\Abstract Syntax Trees</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -105,6 +111,12 @@
       <Filter>Source Files\Abstract Syntax Trees</Filter>
     </ClCompile>
     <ClCompile Include="Print.cpp">
+      <Filter>Source Files\Abstract Syntax Trees</Filter>
+    </ClCompile>
+    <ClCompile Include="Read.cpp">
+      <Filter>Source Files\Abstract Syntax Trees</Filter>
+    </ClCompile>
+    <ClCompile Include="Function.cpp">
       <Filter>Source Files\Abstract Syntax Trees</Filter>
     </ClCompile>
   </ItemGroup>

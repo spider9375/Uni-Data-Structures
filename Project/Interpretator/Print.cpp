@@ -2,9 +2,9 @@
 #include "Print.h"
 
 
-Print::Print(Var* _variable)
+Print::Print(AST* _node)
 {
-	this->variable = _variable;
+	this->node = _node;
 }
 
 

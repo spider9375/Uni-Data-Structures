@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -14,8 +15,20 @@
 int _tmain(int argc, _TCHAR* argv[])
 {
 	std::string input = "";
+	std::ifstream file("Read.txt");
 	
-	while (std::getline(std::cin, input))
+	while (std::getline(file, input))
+	{
+		if (input != "")
+		{
+			Lexer a = Lexer(input);
+			Parser b = Parser(&a);
+			Interpreter c = Interpreter(&b);
+			c.Interpret();
+		}
+	}
+
+	/*while (std::getline(std::cin, input))
 	{
 		if (input != "")
 		{
@@ -25,7 +38,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			c.Interpret();
 		}
 
-	}
+	}*/
 	return 0;
 }
 

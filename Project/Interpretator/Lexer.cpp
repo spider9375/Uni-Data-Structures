@@ -30,6 +30,25 @@ char Lexer::Peek()
 	return this->text[peekPos];
 }
 
+Token* Lexer::Func()
+{
+	while (this->currentChar != ']')
+	{
+		if (this->currentChar == NULL_CHAR)
+		{
+			throw std::exception("Bad syntax");
+		}
+		else
+		{
+			this->Advance();
+		}
+	}
+
+	this->Advance();
+
+	return new Token(KEYWORDS[FUNC]);
+}
+
 Token* Lexer::Id()
 {
 	std::string result = "";
@@ -37,6 +56,11 @@ Token* Lexer::Id()
 	{
 		result += this->currentChar;
 		this->Advance();
+	}
+
+	if (this->currentChar == '[')
+	{
+		return this->Func();
 	}
 
 	if (KEYWORDS.count(result) > 0)

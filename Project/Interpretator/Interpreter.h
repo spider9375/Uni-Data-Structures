@@ -15,8 +15,11 @@ public:
 	unsigned long int VisitNumber(Number* node);
 	unsigned long int VisitBinOp(BinaryOperation* node);
 	unsigned long int visitVar(Var* node);
+	unsigned long int visitFunc(Function* node);
 	void visitAssign(Assign* node);
 	void visitPrint(Print* node);
+	void visitRead(Read* node);
+	void saveFunc(Function* node);
 	void Interpret();
 };
 

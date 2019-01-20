@@ -10,6 +10,7 @@ public:
 	Lexer(std::string _text);
 	~Lexer();
 	Token* Id();
+	Token* Func();
 	void Error();
 	void Advance();
 	void skipWhitespace();

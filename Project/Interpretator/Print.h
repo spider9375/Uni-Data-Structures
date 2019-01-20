@@ -4,8 +4,8 @@
 class Print : public AST
 {
 public:
-	Var* variable;
-	Print(Var* _variable);
+	AST* node;
+	Print(AST* _node);
 	~Print();
 };
 

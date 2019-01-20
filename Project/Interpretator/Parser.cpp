@@ -142,12 +142,83 @@ AST* Parser::Parse()
 	return node;
 }
 
+std::string Parser::GetFuncNameForPrint()
+{
+	int LBRACKET_POS = this->lexer->text.find('[');
+	int RBRACKET_POS = this->lexer->text.find(']');
+	std::string print = "print";
+	int PRINT_POS = this->lexer->text.find(print);
+	int PRINT_END_POS = PRINT_POS + 5;
+	std::string funcName = this->lexer->text.substr(PRINT_END_POS, LBRACKET_POS - PRINT_END_POS);
+	funcName.erase(std::remove(funcName.begin(), funcName.end(), ' '), funcName.end());
+
+	return funcName;
+}
+
+AST* Parser::GetFuncPrintVariable()
+{
+	int LBRACKET_POS = this->lexer->text.find('[');
+	int RBRACKET_POS = this->lexer->text.find(']');
+	std::string varName = this->lexer->text.substr(LBRACKET_POS + 1, RBRACKET_POS - LBRACKET_POS - 1);
+	varName.erase(std::remove(varName.begin(), varName.end(), ' '), varName.end());
+	unsigned long int number = std::stoul(varName);
+
+	if (number)
+	{
+		return new Number(new Token(INTEGER, varName));
+	}
+
+	return new Var(new Token(ID, varName));
+}
+
 AST* Parser::PrintStatement()
 {
 	this->Eat(PRINT);
+	AST* statement;
+
+	if (this->currentToken->type == FUNC)
+	{
+		AST* var = this->GetFuncPrintVariable();
+		std::string funcName = this->GetFuncNameForPrint();
+		Function* func = FUNC_TABLE[funcName];
+		//VAR_TABLE[func->parameter];
+		statement = new Function(this->GetFuncNameForPrint(), var, nullptr);
+
+	}
+	else if (this->currentToken->type == ID)
+	{
+		statement = this->Variable();
+	}
+	else //if (this->currentToken->type == INTEGER)
+	{
+		statement = this->Expression();
+	}
+
+	return new Print(statement);
+}
+
+AST* Parser::ReadStatement()
+{
+	this->Eat(READ);
 	Var* variable = this->Variable();
 
-	return new Print(variable);
+	return new Read(variable);
+}
+
+AST* Parser::FuncStatement()
+{
+	int LBRACKET_POS = this->lexer->text.find('[');
+	int RBRACKET_POS = this->lexer->text.find(']');
+	std::string funcName = this->lexer->text.substr(0, LBRACKET_POS);
+	funcName.erase(std::remove(funcName.begin(), funcName.end(), ' '), funcName.end());
+	std::string varName = this->lexer->text.substr(LBRACKET_POS + 1, RBRACKET_POS - LBRACKET_POS - 1);
+	Token* token = new Token(ID, varName);
+	Var* variable = new Var(token);
+	this->Eat(FUNC);
+	this->Eat(ASSIGN);
+	AST* funcBody = this->Expression();
+	Function* result = new Function(funcName, variable, funcBody);
+	return result;
 }
 
 AST* Parser::Statement()
@@ -160,6 +231,14 @@ AST* Parser::Statement()
 	else if (this->currentToken->type == PRINT)
 	{
 		node = this->PrintStatement();
+	}
+	else if (this->currentToken->type == READ)
+	{
+		node = this->ReadStatement();
+	}
+	else if (this->currentToken->type == FUNC)
+	{
+		node = this->FuncStatement();
 	}
 	else 
 	{

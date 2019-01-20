@@ -6,6 +6,8 @@
 #include "Assign.h"
 #include "NoOp.h"
 #include "Print.h"
+#include "Read.h"
+#include "Function.h"
 #include <cstring>
 #include <algorithm>
 
@@ -18,11 +20,15 @@ public:
 	~Parser();
 	void Error();
 	void Eat(std::string tokenType);
+	std::string GetFuncNameForPrint();
+	AST* GetFuncPrintVariable();
 	AST* Factor();
 	AST* Term();
 	AST* Expression();
 	AST* Parse();
+	AST* FuncStatement();
 	AST* AssignStatement();
+	AST* ReadStatement();
 	AST* PrintStatement();
 	Var* Variable();
 	AST* Statement();

@@ -161,14 +161,17 @@ AST* Parser::GetFuncPrintVariable()
 	int RBRACKET_POS = this->lexer->text.find(']');
 	std::string varName = this->lexer->text.substr(LBRACKET_POS + 1, RBRACKET_POS - LBRACKET_POS - 1);
 	varName.erase(std::remove(varName.begin(), varName.end(), ' '), varName.end());
-	unsigned long int number = std::stoul(varName);
-
-	if (number)
+	unsigned long int number;
+	try
 	{
-		return new Number(new Token(INTEGER, varName));
+		number = std::stoul(varName);
 	}
-
-	return new Var(new Token(ID, varName));
+	catch (std::exception ex)
+	{
+		return new Var(new Token(ID, varName));
+	}
+		
+	return new Number(new Token(INTEGER, varName));
 }
 
 AST* Parser::PrintStatement()

@@ -15,7 +15,7 @@
 int _tmain(int argc, _TCHAR* argv[])
 {
 	std::string input = "";
-	std::ifstream file("Read.txt");
+	/*std::ifstream file("Read.txt");
 	
 	while (std::getline(file, input))
 	{
@@ -26,9 +26,9 @@ int _tmain(int argc, _TCHAR* argv[])
 			Interpreter c = Interpreter(&b);
 			c.Interpret();
 		}
-	}
+	}*/
 
-	/*while (std::getline(std::cin, input))
+	while (std::getline(std::cin, input))
 	{
 		if (input != "")
 		{
@@ -38,7 +38,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			c.Interpret();
 		}
 
-	}*/
+	}
 	return 0;
 }
 

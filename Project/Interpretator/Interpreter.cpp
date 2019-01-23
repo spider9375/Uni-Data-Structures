@@ -54,6 +54,12 @@ unsigned long int Interpreter::visit(AST* node)
 	{
 		return this->visitVar((Var*)node);
 	}
+
+	delete[] number;
+	delete[] binOp;
+	delete[] assign;
+	delete[] func;
+
 }
 
 unsigned long int Interpreter::visitVar(Var* node)
@@ -140,7 +146,12 @@ void Interpreter::visitPrint(Print* node)
 			throw std::exception("Function does not exist");
 		}
 
+		std::string funcParameterName = ((Var*)FUNC_TABLE[func->name]->parameter)->name;
+		VAR_TABLE[funcParameterName] = this->visit(func->parameter);
+
 		result = this->visit(FUNC_TABLE[func->name]);
+
+		VAR_TABLE.erase(funcParameterName);
 	}
 	else if (number)
 	{

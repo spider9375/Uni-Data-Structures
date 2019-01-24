@@ -17,17 +17,6 @@ unsigned long int Interpreter::VisitNumber(Number* node)
 	return node->value;
 }
 
-unsigned long int Interpreter::visitFunc(Function* node)
-{
-	Number* number = dynamic_cast<Number*>(node->parameter);
-	Var* var = dynamic_cast<Var*>(node->parameter);
-
-	if (number)
-	{
-		return this->VisitNumber(number);
-	}
-}
-
 unsigned long int Interpreter::visit(AST* node)
 {
 	Number* number = dynamic_cast<Number*>(node);
@@ -59,7 +48,6 @@ unsigned long int Interpreter::visit(AST* node)
 	delete[] binOp;
 	delete[] assign;
 	delete[] func;
-
 }
 
 unsigned long int Interpreter::visitVar(Var* node)
@@ -106,6 +94,7 @@ void Interpreter::visitRead(Read* node)
 	std::cin >> value;
 
 	VAR_TABLE[node->variable->name] = value;
+
 }
 
 void Interpreter::visitAssign(Assign* node)
@@ -114,7 +103,14 @@ void Interpreter::visitAssign(Assign* node)
 	Var* variable = dynamic_cast<Var*>(node->right);
 	if (variable)
 	{
-		VAR_TABLE[varName] = VAR_TABLE[variable->name];
+		if (VAR_TABLE.count(variable->name) > 0)
+		{
+			VAR_TABLE[varName] = VAR_TABLE[variable->name];
+		}
+		else
+		{
+			throw std::exception("Variable doesn't exist.");
+		}
 	}
 	else
 	{
@@ -134,7 +130,7 @@ void Interpreter::visitPrint(Print* node)
 	{
 		if (VAR_TABLE.count(variable->name) == 0)
 		{
-			throw std::exception("no variable");
+			throw std::exception("Variable does not exist");
 		}
 
 		result = VAR_TABLE[variable->name];
@@ -163,7 +159,6 @@ void Interpreter::visitPrint(Print* node)
 		std::cout << result << std::endl;
 	}
 
-	delete[] node;
 	delete[] variable;
 	delete[] number;
 	delete[] func;

@@ -101,7 +101,17 @@ unsigned long int Lexer::Integer()
 		this->Advance();
 	}
 
-	return std::stoul(result);
+	unsigned long int value;
+	try 
+	{
+		value = std::stoul(result);
+	}
+	catch (std::exception ex)
+	{
+		throw std::exception("Number is out of range");
+	}
+
+	return value;
 }
 
 Token* Lexer::GetNextToken()
@@ -129,6 +139,7 @@ Token* Lexer::GetNextToken()
 			char currentChar = this->currentChar;
 			this->Advance();
 			Token* token = new Token(KEYWORDS[std::string(1, currentChar)]);
+
 			return token;
 		}
 

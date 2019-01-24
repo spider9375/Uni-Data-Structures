@@ -24,7 +24,14 @@ int _tmain(int argc, _TCHAR* argv[])
 			Lexer a = Lexer(input);
 			Parser b = Parser(&a);
 			Interpreter c = Interpreter(&b);
-			c.Interpret();
+			try 
+			{
+				c.Interpret();
+			}
+			catch (std::exception ex)
+			{
+				std::cout << ex.what() << std::endl;
+			}
 		}
 	}*/
 
@@ -35,7 +42,15 @@ int _tmain(int argc, _TCHAR* argv[])
 			Lexer a = Lexer(input);
 			Parser b = Parser(&a);
 			Interpreter c = Interpreter(&b);
-			c.Interpret();
+
+			try 
+			{
+				c.Interpret();
+			}
+			catch (std::exception ex)
+			{
+				std::cout << ex.what() << std::endl;
+			}
 		}
 
 	}
